@@ -1,0 +1,38 @@
+plugins {
+    id 'java' // Apply Java plugin or other relevant plugins
+    id 'com.palantir.docker' version '0.35.0' // Apply Docker plugin
+}
+
+docker {
+    url = 'unix:///var/run/docker.sock' // For Unix-based systems
+    // url = 'npipe:////./pipe/docker_engine' // For Windows systems
+}
+
+// Define a task to build Docker image
+task buildDocker(type: DockerBuildImage) {
+    inputDir = file('path/to/your/dockerfile') // Directory containing Dockerfile
+    tags = ['your-image-name:latest'] // Docker image tag
+}
+
+// Define a task to run Docker container
+task runDocker(type: DockerRun) {
+    dependsOn buildDocker // Ensure the Docker image is built before running
+    image = 'your-image-name:latest' // Docker image to run
+    ports = ['8080:80'] // Map ports (host:container)
+    daemonize = true // Run in detached mode
+}
+
+// Define a task to stop Docker container
+task stopDocker(type: DockerStopContainer) {
+    containerId = 'your-container-id' // Container ID to stop
+}
+
+// Define a task to remove Docker container
+task removeDocker(type: DockerRemoveContainer) {
+    containerId = 'your-container-id' // Container ID to remove
+}
+
+// Optionally, define a task to push Docker image to a registry
+task pushDockerImage(type: DockerPushImage) {
+    imageName = 'your-image-name:latest' // Docker image to push
+}
