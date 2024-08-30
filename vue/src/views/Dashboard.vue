@@ -115,9 +115,9 @@ import TButton from "../components/core/TButton.vue";
 import PageComponent from "../components/PageComponent.vue";
 import { computed } from "vue";
 import { useStore } from "vuex";
-
+//This is a comment
 const store = useStore();
-
+//This is another comment
 const loading = computed(() => store.state.dashboard.loading);
 const data = computed(() => store.state.dashboard.data);
 
