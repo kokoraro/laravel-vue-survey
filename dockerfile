@@ -24,9 +24,11 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Copy existing application directory contents
 COPY . /var/www
 
-# Copy existing application directory permissions
-COPY --chown=www-data:www-data . /var/www
+# Set proper ownership
+RUN chown -R www-data:www-data /var/www
 
-# Expose port 9000 and start php-fpm server
+# Expose port 9000
 EXPOSE 9000
+
+# Start PHP-FPM server
 CMD ["php-fpm"]

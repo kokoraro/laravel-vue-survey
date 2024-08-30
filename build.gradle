@@ -1,38 +1,47 @@
-plugins {
-    id 'java' // Apply Java plugin or other relevant plugins
-    id 'com.palantir.docker' version '0.35.0' // Apply Docker plugin
+apply plugin: 'java'
+apply plugin: 'jacoco'
+
+jacoco {
+    toolVersion = '0.8.7'
 }
 
-docker {
-    url = 'unix:///var/run/docker.sock' // For Unix-based systems
-    // url = 'npipe:////./pipe/docker_engine' // For Windows systems
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 }
 
-// Define a task to build Docker image
-task buildDocker(type: DockerBuildImage) {
-    inputDir = file('path/to/your/dockerfile') // Directory containing Dockerfile
-    tags = ['your-image-name:latest'] // Docker image tag
+group = 'com.example'
+version = 'V1'
+
+repositories {
+    mavenCentral()
 }
 
-// Define a task to run Docker container
-task runDocker(type: DockerRun) {
-    dependsOn buildDocker // Ensure the Docker image is built before running
-    image = 'your-image-name:latest' // Docker image to run
-    ports = ['8080:80'] // Map ports (host:container)
-    daemonize = true // Run in detached mode
+dependencies {
+    testImplementation 'junit:junit:4.13.2'
 }
 
-// Define a task to stop Docker container
-task stopDocker(type: DockerStopContainer) {
-    containerId = 'your-container-id' // Container ID to stop
+test {
+    testClassesDirs = sourceSets.test.output.classesDirs
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+    }
+    finalizedBy jacocoTestReport
 }
 
-// Define a task to remove Docker container
-task removeDocker(type: DockerRemoveContainer) {
-    containerId = 'your-container-id' // Container ID to remove
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.example.HelloWorld'
+    }
+    from sourceSets.main.output
+    archiveBaseName = 'hello-world-java'
+    destinationDirectory.set(file('build/libs'))
 }
 
-// Optionally, define a task to push Docker image to a registry
-task pushDockerImage(type: DockerPushImage) {
-    imageName = 'your-image-name:latest' // Docker image to push
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+    }
 }
